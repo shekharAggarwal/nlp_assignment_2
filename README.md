@@ -1,6 +1,15 @@
 # BERT vs PubMedBERT on PubMedQA
 
-Assignment: BERT variant comparison. I fine-tuned a general-domain BERT and a biomedical BERT on the
+Natural Language Processing (S1-26_AIMLZG530), Assignment 2, Set 8, Group 75
+
+| Name | BITS ID |
+|---|---|
+| Shekhar Aggarwal | 2025AG05925 |
+| Asutosh Kumar | 2025AG05453 |
+| Shashank | 2025AG05459 |
+| Ansh Handa | 2025AG05735 |
+
+Task: BERT variant comparison. We fine-tuned a general-domain BERT and a biomedical BERT on the
 same task and compared them.
 
 - Dataset: PubMedQA, `pqa_labeled` config (Hugging Face: `qiaojin/PubMedQA`, the current location of `pubmed_qa`)
@@ -14,7 +23,8 @@ same task and compared them.
 |---|---|
 | `BERT_vs_PubMedBERT_PubMedQA.ipynb` | Main notebook with code, outputs, plots and analysis |
 | `BERT_vs_PubMedBERT_PubMedQA.html` | The same notebook exported to HTML, for reading without Jupyter |
-| `requirements.txt` | Package versions I used |
+| `Group75_Assignment2_Set8_Report.pdf` | The same notebook as a PDF report |
+| `requirements.txt` | Package versions we used |
 | `saved_outputs/results_per_run.csv` | Test metrics for every run (2 models x 3 seeds) |
 | `saved_outputs/history_*.json` | Validation metrics per epoch for every run |
 | `saved_outputs/test_probs_*.npy` | Test-set probabilities for every run (used in the error analysis) |
@@ -56,6 +66,6 @@ jupyter notebook BERT_vs_PubMedBERT_PubMedQA.ipynb
 ```
 
 Runs on CUDA, Apple MPS or CPU (CPU will be very slow). Running the whole notebook trains all 6 models
-from scratch, which took about 90 minutes on my laptop. The notebook writes its results to `outputs/`. If it
+from scratch, which took about 90 minutes on our laptop. The notebook writes its results to `outputs/`. If it
 is re-run, runs that are already in `outputs/` are loaded instead of being trained again. `saved_outputs/`
-holds a copy of the results from my run, which are the numbers shown in the notebook.
+holds a copy of the results from our run, which are the numbers shown in the notebook.

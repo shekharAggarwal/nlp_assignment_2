@@ -7802,7 +7802,34 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="BERT-vs-PubMedBERT-on-PubMedQA">BERT vs PubMedBERT on PubMedQA<a class="anchor-link" href="#BERT-vs-PubMedBERT-on-PubMedQA">¶</a></h1><p><strong>Name:</strong> ____________  <strong>Roll No.:</strong> ____________</p>
+<h1 id="BERT-vs-PubMedBERT-on-PubMedQA">BERT vs PubMedBERT on PubMedQA<a class="anchor-link" href="#BERT-vs-PubMedBERT-on-PubMedQA">¶</a></h1><p><strong>Course:</strong> Natural Language Processing (S1-26_AIMLZG530)<br/>
+<strong>Assignment 2, Set 8, Group 75</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>BITS ID</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shekhar Aggarwal</td>
+<td>2025AG05925</td>
+</tr>
+<tr>
+<td>Asutosh Kumar</td>
+<td>2025AG05453</td>
+</tr>
+<tr>
+<td>Shashank</td>
+<td>2025AG05459</td>
+</tr>
+<tr>
+<td>Ansh Handa</td>
+<td>2025AG05735</td>
+</tr>
+</tbody>
+</table>
 <ul>
 <li><strong>Task:</strong> BERT variant comparison (general-domain BERT vs domain-specific BERT)</li>
 <li><strong>Dataset:</strong> PubMedQA, <code>pqa_labeled</code> subset (1000 expert-labelled questions)</li>
@@ -7811,7 +7838,7 @@ a.anchor-link {
 </ul>
 <p>PubMedQA gives a research question (usually taken from the title of a PubMed paper) and the
 abstract of that paper without its conclusion. The model has to answer <strong>yes / no / maybe</strong>.
-I treat it as 3-class sequence-pair classification: the question is segment A and the abstract
+We treat it as 3-class sequence-pair classification: the question is segment A and the abstract
 text is segment B.</p>
 <p>Both models are BERT-base with the same architecture (12 layers, 768 hidden, 110M params). The
 difference is the pretraining data and vocabulary. BERT was trained on Wikipedia + BookCorpus,
@@ -7879,7 +7906,7 @@ assignment wants us to look at.</p>
 <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
     <span class="n">device</span> <span class="o">=</span> <span class="s2">"cuda"</span>
 <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
-    <span class="n">device</span> <span class="o">=</span> <span class="s2">"mps"</span>   <span class="c1"># I ran this on a MacBook (Apple M5, 16GB)</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="s2">"mps"</span>   <span class="c1"># we ran this on a MacBook (Apple M5, 16GB)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">device</span> <span class="o">=</span> <span class="s2">"cpu"</span>
 
@@ -7929,7 +7956,7 @@ device: mps
 <span class="n">HPARAMS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
     <span class="n">learning_rate</span><span class="o">=</span><span class="mf">3e-5</span><span class="p">,</span>
     <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>   <span class="c1"># effective batch size 16 (16 at once ran out of memory on my laptop)</span>
+    <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>   <span class="c1"># effective batch size 16 (16 at once ran out of memory on our laptop)</span>
     <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
     <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">warmup_steps</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>     <span class="c1"># in transformers 5 a float &lt; 1 here means warmup ratio</span>
@@ -7951,14 +7978,14 @@ device: mps
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="2.-Dataset-loading">2. Dataset loading<a class="anchor-link" href="#2.-Dataset-loading">¶</a></h2><p>The <code>pubmed_qa</code> dataset on the Hugging Face Hub has moved to <code>qiaojin/PubMedQA</code> (the old name was a
-script-based loader; with the <code>datasets</code> version I used, <code>load_dataset("pubmed_qa", ...)</code> fails because repo ids now need a namespace). The data is the same.
+script-based loader; with the <code>datasets</code> version we used, <code>load_dataset("pubmed_qa", ...)</code> fails because repo ids now need a namespace). The data is the same.
 It has three configs:</p>
 <ul>
 <li><code>pqa_labeled</code>: 1k questions labelled by experts (yes/no/maybe)</li>
 <li><code>pqa_unlabeled</code>: 61k without labels</li>
 <li><code>pqa_artificial</code>: 211k labelled automatically by a heuristic (yes/no only)</li>
 </ul>
-<p>I use <code>pqa_labeled</code> because it is the only one with human labels and the "maybe" class.</p>
+<p>We use <code>pqa_labeled</code> because it is the only one with human labels and the "maybe" class.</p>
 </div>
 </div>
 </div>
@@ -8106,11 +8133,11 @@ majority class share: 0.552
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>The labels are imbalanced: about 55% yes, 34% no and only 11% maybe. A model that always says
-"yes" already gets ~0.55 accuracy, so accuracy alone can be misleading here. I report macro-F1
+"yes" already gets ~0.55 accuracy, so accuracy alone can be misleading here. We report macro-F1
 as the main metric and also keep a majority-class baseline in the results table.</p>
 <p><strong>Important:</strong> each row also has a <code>long_answer</code> field, which is the conclusion of the abstract.
 It basically states the answer ("...these results suggest that X does not ..."), so using it as
-input would leak the label. I only use <code>question</code> + <code>context.contexts</code>. This matches the
+input would leak the label. We only use <code>question</code> + <code>context.contexts</code>. This matches the
 "reasoning-required" setting from the PubMedQA paper.</p>
 </div>
 </div>
@@ -8131,7 +8158,7 @@ fixed seed, and both models use exactly the same split.</li>
 <li>Tokenize as a sentence pair <code>[CLS] question [SEP] context [SEP]</code>. If the pair is longer than 512
 tokens, only the context gets truncated (<code>truncation="only_second"</code>), so the question is never cut.</li>
 </ol>
-<p>All inputs are padded to 512 inside the data collator. I first tried dynamic padding (pad to the
+<p>All inputs are padded to 512 inside the data collator. We first tried dynamic padding (pad to the
 longest example in the batch), but on Apple MPS the changing tensor shapes made memory use grow
 until the laptop started swapping and each step took ~30 s instead of ~2 s. Fixed-size batches fixed it.</p>
 </div>
@@ -8537,7 +8564,7 @@ from pieces like <code>he ##pa ##to ##cellular</code>.</p>
 <li>AdamW, lr 3e-5, linear decay with 10% warmup, weight decay 0.01, effective batch size 16 (8 x 2 accumulation steps)</li>
 <li>10 epochs, evaluate on validation after every epoch, and keep the checkpoint with the best
 <strong>validation macro-F1</strong> (not lowest loss / best accuracy, because those can favour the "always yes"
-behaviour). I don't use early stopping: the validation set has only 100 examples, so its F1 jumps
+behaviour). We don't use early stopping: the validation set has only 100 examples, so its F1 jumps
 around between epochs and early stopping could end a run too soon.</li>
 <li><strong>class-weighted cross-entropy</strong>: weights are inversely proportional to class frequency in the
 training set, so that mistakes on the small "maybe" class (11%) cost more.</li>
@@ -8567,7 +8594,7 @@ bit from seed to seed, and one run could give a misleading comparison.</li>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="c1"># my loss is a plain mean over the batch, so the Trainer has to divide it by the number of</span>
+        <span class="c1"># our loss is a plain mean over the batch, so the Trainer has to divide it by the number of</span>
         <span class="c1"># gradient accumulation steps itself. Without this flag it assumes the model already did that</span>
         <span class="c1"># (BertForSequenceClassification.forward takes **kwargs) and the logged loss comes out 2x too big.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_accepts_loss_kwargs</span> <span class="o">=</span> <span class="kc">False</span>
@@ -8683,11 +8710,11 @@ class weights: {'yes': np.float32(0.603), 'no': np.float32(0.989), 'maybe': np.f
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>Training loop. For every run, the test-set probabilities are saved so the later analysis can use
-them without retraining. For each model I also keep the run with the best <strong>validation</strong> macro-F1 (the test
+them without retraining. For each model we also keep the run with the best <strong>validation</strong> macro-F1 (the test
 set is not used to pick it) and save it to <code>outputs/best_&lt;model&gt;</code> for the custom-example
 predictions. Results, histories and probabilities are written to <code>outputs/</code> after every run. If the notebook is
 re-run, finished runs are loaded from disk instead of being trained again (training all 6 runs takes
-over an hour on my laptop).</p>
+over an hour on our laptop).</p>
 </div>
 </div>
 </div>
@@ -8764,160 +8791,6 @@ over an hour on my laptop).</p>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.107', 'grad_norm': '6.709', 'learning_rate': '2.932e-05', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.116', 'eval_accuracy': '0.55', 'eval_precision_macro': '0.1833', 'eval_recall_macro': '0.3333', 'eval_f1_macro': '0.2366', 'eval_precision_weighted': '0.3025', 'eval_recall_weighted': '0.55', 'eval_f1_weighted': '0.3903', 'eval_runtime': '3.089', 'eval_samples_per_second': '32.37', 'eval_steps_per_second': '2.266', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.092', 'grad_norm': '3.84', 'learning_rate': '2.674e-05', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.087', 'eval_accuracy': '0.34', 'eval_precision_macro': '0.2789', 'eval_recall_macro': '0.3296', 'eval_f1_macro': '0.1784', 'eval_precision_weighted': '0.3895', 'eval_recall_weighted': '0.34', 'eval_f1_weighted': '0.1893', 'eval_runtime': '3.296', 'eval_samples_per_second': '30.34', 'eval_steps_per_second': '2.124', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.9925', 'grad_norm': '9.354', 'learning_rate': '2.341e-05', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.164', 'eval_accuracy': '0.53', 'eval_precision_macro': '0.3426', 'eval_recall_macro': '0.3699', 'eval_f1_macro': '0.3514', 'eval_precision_weighted': '0.4677', 'eval_recall_weighted': '0.53', 'eval_f1_weighted': '0.4918', 'eval_runtime': '3.352', 'eval_samples_per_second': '29.83', 'eval_steps_per_second': '2.088', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.7545', 'grad_norm': '11.99', 'learning_rate': '2.008e-05', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.13', 'eval_accuracy': '0.38', 'eval_precision_macro': '0.4639', 'eval_recall_macro': '0.4059', 'eval_f1_macro': '0.3472', 'eval_precision_weighted': '0.6273', 'eval_recall_weighted': '0.38', 'eval_f1_weighted': '0.3903', 'eval_runtime': '3.215', 'eval_samples_per_second': '31.1', 'eval_steps_per_second': '2.177', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.4429', 'grad_norm': '22.87', 'learning_rate': '1.674e-05', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.401', 'eval_accuracy': '0.52', 'eval_precision_macro': '0.4558', 'eval_recall_macro': '0.4105', 'eval_f1_macro': '0.4082', 'eval_precision_weighted': '0.5105', 'eval_recall_weighted': '0.52', 'eval_f1_weighted': '0.5057', 'eval_runtime': '3.138', 'eval_samples_per_second': '31.87', 'eval_steps_per_second': '2.231', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.2046', 'grad_norm': '2.258', 'learning_rate': '1.341e-05', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.856', 'eval_accuracy': '0.57', 'eval_precision_macro': '0.4597', 'eval_recall_macro': '0.4258', 'eval_f1_macro': '0.4272', 'eval_precision_weighted': '0.5399', 'eval_recall_weighted': '0.57', 'eval_f1_weighted': '0.5462', 'eval_runtime': '3.072', 'eval_samples_per_second': '32.55', 'eval_steps_per_second': '2.279', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.09198', 'grad_norm': '3.333', 'learning_rate': '1.008e-05', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.923', 'eval_accuracy': '0.58', 'eval_precision_macro': '0.5249', 'eval_recall_macro': '0.5308', 'eval_f1_macro': '0.5226', 'eval_precision_weighted': '0.6011', 'eval_recall_weighted': '0.58', 'eval_f1_weighted': '0.5838', 'eval_runtime': '3.134', 'eval_samples_per_second': '31.91', 'eval_steps_per_second': '2.234', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.04923', 'grad_norm': '0.2027', 'learning_rate': '6.742e-06', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.07', 'eval_accuracy': '0.57', 'eval_precision_macro': '0.5052', 'eval_recall_macro': '0.521', 'eval_f1_macro': '0.509', 'eval_precision_weighted': '0.5906', 'eval_recall_weighted': '0.57', 'eval_f1_weighted': '0.5756', 'eval_runtime': '3.071', 'eval_samples_per_second': '32.56', 'eval_steps_per_second': '2.279', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.02644', 'grad_norm': '0.4145', 'learning_rate': '3.409e-06', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.316', 'eval_accuracy': '0.6', 'eval_precision_macro': '0.5601', 'eval_recall_macro': '0.5075', 'eval_f1_macro': '0.5222', 'eval_precision_weighted': '0.5963', 'eval_recall_weighted': '0.6', 'eval_f1_weighted': '0.594', 'eval_runtime': '3.15', 'eval_samples_per_second': '31.75', 'eval_steps_per_second': '2.223', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.01863', 'grad_norm': '0.3563', 'learning_rate': '7.576e-08', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.343', 'eval_accuracy': '0.6', 'eval_precision_macro': '0.5384', 'eval_recall_macro': '0.5037', 'eval_f1_macro': '0.5151', 'eval_precision_weighted': '0.5918', 'eval_recall_weighted': '0.6', 'eval_f1_weighted': '0.5937', 'eval_runtime': '3.132', 'eval_samples_per_second': '31.92', 'eval_steps_per_second': '2.235', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'train_runtime': '907.6', 'train_samples_per_second': '7.713', 'train_steps_per_second': '0.485', 'train_loss': '0.478', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.924', 'eval_accuracy': '0.58', 'eval_precision_macro': '0.5249', 'eval_recall_macro': '0.5308', 'eval_f1_macro': '0.5226', 'eval_precision_weighted': '0.6011', 'eval_recall_weighted': '0.58', 'eval_f1_weighted': '0.5838', 'eval_runtime': '3.147', 'eval_samples_per_second': '31.77', 'eval_steps_per_second': '2.224', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>    best epoch 7 | val F1 0.523 | test acc 0.400 | test macro-F1 0.315 | 15.1 min
 </pre>
 </div>
@@ -8926,160 +8799,6 @@ over an hour on my laptop).</p>
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>==&gt; BERT  seed=7
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.142', 'grad_norm': '4.877', 'learning_rate': '2.932e-05', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.101', 'eval_accuracy': '0.53', 'eval_precision_macro': '0.1803', 'eval_recall_macro': '0.3212', 'eval_f1_macro': '0.2309', 'eval_precision_weighted': '0.2974', 'eval_recall_weighted': '0.53', 'eval_f1_weighted': '0.381', 'eval_runtime': '3.131', 'eval_samples_per_second': '31.94', 'eval_steps_per_second': '2.236', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.105', 'grad_norm': '4.84', 'learning_rate': '2.674e-05', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.114', 'eval_accuracy': '0.55', 'eval_precision_macro': '0.1833', 'eval_recall_macro': '0.3333', 'eval_f1_macro': '0.2366', 'eval_precision_weighted': '0.3025', 'eval_recall_weighted': '0.55', 'eval_f1_weighted': '0.3903', 'eval_runtime': '3.127', 'eval_samples_per_second': '31.98', 'eval_steps_per_second': '2.239', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.094', 'grad_norm': '4.326', 'learning_rate': '2.341e-05', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.092', 'eval_accuracy': '0.56', 'eval_precision_macro': '0.4564', 'eval_recall_macro': '0.3824', 'eval_f1_macro': '0.3581', 'eval_precision_weighted': '0.511', 'eval_recall_weighted': '0.56', 'eval_f1_weighted': '0.4813', 'eval_runtime': '3.137', 'eval_samples_per_second': '31.88', 'eval_steps_per_second': '2.231', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.048', 'grad_norm': '6.794', 'learning_rate': '2.008e-05', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.11', 'eval_accuracy': '0.53', 'eval_precision_macro': '0.3069', 'eval_recall_macro': '0.3437', 'eval_f1_macro': '0.309', 'eval_precision_weighted': '0.4365', 'eval_recall_weighted': '0.53', 'eval_f1_weighted': '0.4614', 'eval_runtime': '3.13', 'eval_samples_per_second': '31.95', 'eval_steps_per_second': '2.236', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.9158', 'grad_norm': '15.73', 'learning_rate': '1.674e-05', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.123', 'eval_accuracy': '0.45', 'eval_precision_macro': '0.391', 'eval_recall_macro': '0.3941', 'eval_f1_macro': '0.3833', 'eval_precision_weighted': '0.4999', 'eval_recall_weighted': '0.45', 'eval_f1_weighted': '0.4698', 'eval_runtime': '3.127', 'eval_samples_per_second': '31.98', 'eval_steps_per_second': '2.239', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.7185', 'grad_norm': '7.85', 'learning_rate': '1.341e-05', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.264', 'eval_accuracy': '0.47', 'eval_precision_macro': '0.3698', 'eval_recall_macro': '0.3615', 'eval_f1_macro': '0.3611', 'eval_precision_weighted': '0.4633', 'eval_recall_weighted': '0.47', 'eval_f1_weighted': '0.4645', 'eval_runtime': '3.122', 'eval_samples_per_second': '32.03', 'eval_steps_per_second': '2.242', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.4868', 'grad_norm': '7.097', 'learning_rate': '1.008e-05', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.457', 'eval_accuracy': '0.51', 'eval_precision_macro': '0.4061', 'eval_recall_macro': '0.3988', 'eval_f1_macro': '0.3996', 'eval_precision_weighted': '0.4898', 'eval_recall_weighted': '0.51', 'eval_f1_weighted': '0.4969', 'eval_runtime': '3.125', 'eval_samples_per_second': '32', 'eval_steps_per_second': '2.24', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.2782', 'grad_norm': '10.21', 'learning_rate': '6.742e-06', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.612', 'eval_accuracy': '0.57', 'eval_precision_macro': '0.4836', 'eval_recall_macro': '0.4688', 'eval_f1_macro': '0.4695', 'eval_precision_weighted': '0.5746', 'eval_recall_weighted': '0.57', 'eval_f1_weighted': '0.5677', 'eval_runtime': '3.129', 'eval_samples_per_second': '31.96', 'eval_steps_per_second': '2.237', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.1614', 'grad_norm': '11.61', 'learning_rate': '3.409e-06', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.023', 'eval_accuracy': '0.52', 'eval_precision_macro': '0.4136', 'eval_recall_macro': '0.3843', 'eval_f1_macro': '0.3843', 'eval_precision_weighted': '0.4885', 'eval_recall_weighted': '0.52', 'eval_f1_weighted': '0.4967', 'eval_runtime': '3.123', 'eval_samples_per_second': '32.02', 'eval_steps_per_second': '2.241', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.1204', 'grad_norm': '5.976', 'learning_rate': '7.576e-08', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.028', 'eval_accuracy': '0.53', 'eval_precision_macro': '0.4306', 'eval_recall_macro': '0.4053', 'eval_f1_macro': '0.4048', 'eval_precision_weighted': '0.5144', 'eval_recall_weighted': '0.53', 'eval_f1_weighted': '0.5173', 'eval_runtime': '3.153', 'eval_samples_per_second': '31.71', 'eval_steps_per_second': '2.22', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'train_runtime': '917.9', 'train_samples_per_second': '7.626', 'train_steps_per_second': '0.479', 'train_loss': '0.707', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.613', 'eval_accuracy': '0.57', 'eval_precision_macro': '0.4836', 'eval_recall_macro': '0.4688', 'eval_f1_macro': '0.4695', 'eval_precision_weighted': '0.5746', 'eval_recall_weighted': '0.57', 'eval_f1_weighted': '0.5677', 'eval_runtime': '3.149', 'eval_samples_per_second': '31.75', 'eval_steps_per_second': '2.223', 'epoch': '10'}
 </pre>
 </div>
 </div>
@@ -9100,316 +8819,8 @@ over an hour on my laptop).</p>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.11', 'grad_norm': '6.522', 'learning_rate': '2.932e-05', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.107', 'eval_accuracy': '0.55', 'eval_precision_macro': '0.1833', 'eval_recall_macro': '0.3333', 'eval_f1_macro': '0.2366', 'eval_precision_weighted': '0.3025', 'eval_recall_weighted': '0.55', 'eval_f1_weighted': '0.3903', 'eval_runtime': '3.131', 'eval_samples_per_second': '31.93', 'eval_steps_per_second': '2.235', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.098', 'grad_norm': '2.282', 'learning_rate': '2.674e-05', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.099', 'eval_accuracy': '0.55', 'eval_precision_macro': '0.1833', 'eval_recall_macro': '0.3333', 'eval_f1_macro': '0.2366', 'eval_precision_weighted': '0.3025', 'eval_recall_weighted': '0.55', 'eval_f1_weighted': '0.3903', 'eval_runtime': '3.126', 'eval_samples_per_second': '31.99', 'eval_steps_per_second': '2.24', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.055', 'grad_norm': '4.957', 'learning_rate': '2.341e-05', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.156', 'eval_accuracy': '0.54', 'eval_precision_macro': '0.1837', 'eval_recall_macro': '0.3273', 'eval_f1_macro': '0.2353', 'eval_precision_weighted': '0.3031', 'eval_recall_weighted': '0.54', 'eval_f1_weighted': '0.3882', 'eval_runtime': '3.136', 'eval_samples_per_second': '31.89', 'eval_steps_per_second': '2.232', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.8775', 'grad_norm': '9.697', 'learning_rate': '2.008e-05', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.277', 'eval_accuracy': '0.49', 'eval_precision_macro': '0.307', 'eval_recall_macro': '0.325', 'eval_f1_macro': '0.2783', 'eval_precision_weighted': '0.3665', 'eval_recall_weighted': '0.49', 'eval_f1_weighted': '0.3903', 'eval_runtime': '3.134', 'eval_samples_per_second': '31.91', 'eval_steps_per_second': '2.234', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.5502', 'grad_norm': '4.31', 'learning_rate': '1.674e-05', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.463', 'eval_accuracy': '0.51', 'eval_precision_macro': '0.4169', 'eval_recall_macro': '0.4118', 'eval_f1_macro': '0.4026', 'eval_precision_weighted': '0.4895', 'eval_recall_weighted': '0.51', 'eval_f1_weighted': '0.4862', 'eval_runtime': '3.135', 'eval_samples_per_second': '31.89', 'eval_steps_per_second': '2.233', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.3289', 'grad_norm': '5.82', 'learning_rate': '1.341e-05', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.723', 'eval_accuracy': '0.5', 'eval_precision_macro': '0.4344', 'eval_recall_macro': '0.4169', 'eval_f1_macro': '0.4219', 'eval_precision_weighted': '0.4846', 'eval_recall_weighted': '0.5', 'eval_f1_weighted': '0.4884', 'eval_runtime': '3.134', 'eval_samples_per_second': '31.91', 'eval_steps_per_second': '2.233', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.1447', 'grad_norm': '10.48', 'learning_rate': '1.008e-05', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.935', 'eval_accuracy': '0.49', 'eval_precision_macro': '0.4403', 'eval_recall_macro': '0.3923', 'eval_f1_macro': '0.388', 'eval_precision_weighted': '0.4968', 'eval_recall_weighted': '0.49', 'eval_f1_weighted': '0.48', 'eval_runtime': '3.139', 'eval_samples_per_second': '31.86', 'eval_steps_per_second': '2.23', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.05337', 'grad_norm': '11.76', 'learning_rate': '6.742e-06', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.413', 'eval_accuracy': '0.59', 'eval_precision_macro': '0.5512', 'eval_recall_macro': '0.451', 'eval_f1_macro': '0.4643', 'eval_precision_weighted': '0.5749', 'eval_recall_weighted': '0.59', 'eval_f1_weighted': '0.5588', 'eval_runtime': '3.133', 'eval_samples_per_second': '31.91', 'eval_steps_per_second': '2.234', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.02319', 'grad_norm': '0.2041', 'learning_rate': '3.409e-06', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.52', 'eval_accuracy': '0.54', 'eval_precision_macro': '0.5148', 'eval_recall_macro': '0.4357', 'eval_f1_macro': '0.45', 'eval_precision_weighted': '0.5361', 'eval_recall_weighted': '0.54', 'eval_f1_weighted': '0.5291', 'eval_runtime': '3.145', 'eval_samples_per_second': '31.79', 'eval_steps_per_second': '2.226', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.01507', 'grad_norm': '0.3148', 'learning_rate': '7.576e-08', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.593', 'eval_accuracy': '0.54', 'eval_precision_macro': '0.5148', 'eval_recall_macro': '0.4357', 'eval_f1_macro': '0.45', 'eval_precision_weighted': '0.5361', 'eval_recall_weighted': '0.54', 'eval_f1_weighted': '0.5291', 'eval_runtime': '3.137', 'eval_samples_per_second': '31.88', 'eval_steps_per_second': '2.232', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'train_runtime': '917.1', 'train_samples_per_second': '7.633', 'train_steps_per_second': '0.48', 'train_loss': '0.5257', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.412', 'eval_accuracy': '0.59', 'eval_precision_macro': '0.5512', 'eval_recall_macro': '0.451', 'eval_f1_macro': '0.4643', 'eval_precision_weighted': '0.5749', 'eval_recall_weighted': '0.59', 'eval_f1_weighted': '0.5588', 'eval_runtime': '3.148', 'eval_samples_per_second': '31.77', 'eval_steps_per_second': '2.224', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>    best epoch 8 | val F1 0.464 | test acc 0.570 | test macro-F1 0.411 | 15.3 min
 ==&gt; PubMedBERT  seed=42
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.127', 'grad_norm': '10.68', 'learning_rate': '2.932e-05', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.159', 'eval_accuracy': '0.55', 'eval_precision_macro': '0.1833', 'eval_recall_macro': '0.3333', 'eval_f1_macro': '0.2366', 'eval_precision_weighted': '0.3025', 'eval_recall_weighted': '0.55', 'eval_f1_weighted': '0.3903', 'eval_runtime': '3.05', 'eval_samples_per_second': '32.79', 'eval_steps_per_second': '2.295', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.07', 'grad_norm': '10.27', 'learning_rate': '2.674e-05', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.116', 'eval_accuracy': '0.39', 'eval_precision_macro': '0.3983', 'eval_recall_macro': '0.3636', 'eval_f1_macro': '0.2317', 'eval_precision_weighted': '0.5813', 'eval_recall_weighted': '0.39', 'eval_f1_weighted': '0.2708', 'eval_runtime': '3.04', 'eval_samples_per_second': '32.89', 'eval_steps_per_second': '2.303', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.9353', 'grad_norm': '18.63', 'learning_rate': '2.341e-05', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.16', 'eval_accuracy': '0.58', 'eval_precision_macro': '0.416', 'eval_recall_macro': '0.3815', 'eval_f1_macro': '0.3523', 'eval_precision_weighted': '0.5464', 'eval_recall_weighted': '0.58', 'eval_f1_weighted': '0.5083', 'eval_runtime': '3.039', 'eval_samples_per_second': '32.9', 'eval_steps_per_second': '2.303', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.5973', 'grad_norm': '23.74', 'learning_rate': '2.008e-05', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.078', 'eval_accuracy': '0.55', 'eval_precision_macro': '0.5071', 'eval_recall_macro': '0.4979', 'eval_f1_macro': '0.4564', 'eval_precision_weighted': '0.6373', 'eval_recall_weighted': '0.55', 'eval_f1_weighted': '0.5322', 'eval_runtime': '3.041', 'eval_samples_per_second': '32.88', 'eval_steps_per_second': '2.302', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.3026', 'grad_norm': '12.22', 'learning_rate': '1.674e-05', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.378', 'eval_accuracy': '0.65', 'eval_precision_macro': '0.4454', 'eval_recall_macro': '0.4988', 'eval_f1_macro': '0.4614', 'eval_precision_weighted': '0.6196', 'eval_recall_weighted': '0.65', 'eval_f1_weighted': '0.623', 'eval_runtime': '3.04', 'eval_samples_per_second': '32.9', 'eval_steps_per_second': '2.303', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.1226', 'grad_norm': '8.555', 'learning_rate': '1.341e-05', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.087', 'eval_accuracy': '0.64', 'eval_precision_macro': '0.4185', 'eval_recall_macro': '0.459', 'eval_f1_macro': '0.4358', 'eval_precision_weighted': '0.5658', 'eval_recall_weighted': '0.64', 'eval_f1_weighted': '0.5982', 'eval_runtime': '3.039', 'eval_samples_per_second': '32.9', 'eval_steps_per_second': '2.303', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.03688', 'grad_norm': '1.622', 'learning_rate': '1.008e-05', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.73', 'eval_accuracy': '0.67', 'eval_precision_macro': '0.4515', 'eval_recall_macro': '0.4772', 'eval_f1_macro': '0.4583', 'eval_precision_weighted': '0.6025', 'eval_recall_weighted': '0.67', 'eval_f1_weighted': '0.6274', 'eval_runtime': '3.04', 'eval_samples_per_second': '32.9', 'eval_steps_per_second': '2.303', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.02443', 'grad_norm': '0.158', 'learning_rate': '6.742e-06', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.775', 'eval_accuracy': '0.68', 'eval_precision_macro': '0.4516', 'eval_recall_macro': '0.4945', 'eval_f1_macro': '0.4712', 'eval_precision_weighted': '0.6092', 'eval_recall_weighted': '0.68', 'eval_f1_weighted': '0.6417', 'eval_runtime': '3.053', 'eval_samples_per_second': '32.76', 'eval_steps_per_second': '2.293', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.01247', 'grad_norm': '0.2595', 'learning_rate': '3.409e-06', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.893', 'eval_accuracy': '0.68', 'eval_precision_macro': '0.4437', 'eval_recall_macro': '0.4982', 'eval_f1_macro': '0.4694', 'eval_precision_weighted': '0.605', 'eval_recall_weighted': '0.68', 'eval_f1_weighted': '0.6403', 'eval_runtime': '3.047', 'eval_samples_per_second': '32.81', 'eval_steps_per_second': '2.297', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.00352', 'grad_norm': '0.07977', 'learning_rate': '7.576e-08', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.795', 'eval_accuracy': '0.69', 'eval_precision_macro': '0.4529', 'eval_recall_macro': '0.5155', 'eval_f1_macro': '0.4805', 'eval_precision_weighted': '0.6232', 'eval_recall_weighted': '0.69', 'eval_f1_weighted': '0.6528', 'eval_runtime': '3.04', 'eval_samples_per_second': '32.9', 'eval_steps_per_second': '2.303', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'train_runtime': '924.9', 'train_samples_per_second': '7.569', 'train_steps_per_second': '0.476', 'train_loss': '0.4232', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.795', 'eval_accuracy': '0.69', 'eval_precision_macro': '0.4529', 'eval_recall_macro': '0.5155', 'eval_f1_macro': '0.4805', 'eval_precision_weighted': '0.6232', 'eval_recall_weighted': '0.69', 'eval_f1_weighted': '0.6528', 'eval_runtime': '3.054', 'eval_samples_per_second': '32.74', 'eval_steps_per_second': '2.292', 'epoch': '10'}
 </pre>
 </div>
 </div>
@@ -9430,160 +8841,6 @@ over an hour on my laptop).</p>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.102', 'grad_norm': '13.9', 'learning_rate': '2.932e-05', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.215', 'eval_accuracy': '0.54', 'eval_precision_macro': '0.1818', 'eval_recall_macro': '0.3273', 'eval_f1_macro': '0.2338', 'eval_precision_weighted': '0.3', 'eval_recall_weighted': '0.54', 'eval_f1_weighted': '0.3857', 'eval_runtime': '3.045', 'eval_samples_per_second': '32.84', 'eval_steps_per_second': '2.299', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.044', 'grad_norm': '14.27', 'learning_rate': '2.674e-05', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.044', 'eval_accuracy': '0.56', 'eval_precision_macro': '0.3865', 'eval_recall_macro': '0.433', 'eval_f1_macro': '0.394', 'eval_precision_weighted': '0.5456', 'eval_recall_weighted': '0.56', 'eval_f1_weighted': '0.5348', 'eval_runtime': '2.985', 'eval_samples_per_second': '33.5', 'eval_steps_per_second': '2.345', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.8358', 'grad_norm': '25.67', 'learning_rate': '2.341e-05', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.113', 'eval_accuracy': '0.32', 'eval_precision_macro': '0.4159', 'eval_recall_macro': '0.3656', 'eval_f1_macro': '0.3067', 'eval_precision_weighted': '0.5535', 'eval_recall_weighted': '0.32', 'eval_f1_weighted': '0.3708', 'eval_runtime': '2.988', 'eval_samples_per_second': '33.47', 'eval_steps_per_second': '2.343', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.5734', 'grad_norm': '17.01', 'learning_rate': '2.008e-05', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.189', 'eval_accuracy': '0.53', 'eval_precision_macro': '0.3754', 'eval_recall_macro': '0.3848', 'eval_f1_macro': '0.3798', 'eval_precision_weighted': '0.5229', 'eval_recall_weighted': '0.53', 'eval_f1_weighted': '0.5261', 'eval_runtime': '2.983', 'eval_samples_per_second': '33.52', 'eval_steps_per_second': '2.346', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.2753', 'grad_norm': '16.4', 'learning_rate': '1.674e-05', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.417', 'eval_accuracy': '0.47', 'eval_precision_macro': '0.3787', 'eval_recall_macro': '0.354', 'eval_f1_macro': '0.3625', 'eval_precision_weighted': '0.5094', 'eval_recall_weighted': '0.47', 'eval_f1_weighted': '0.4872', 'eval_runtime': '2.987', 'eval_samples_per_second': '33.48', 'eval_steps_per_second': '2.343', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.1045', 'grad_norm': '4.541', 'learning_rate': '1.341e-05', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.835', 'eval_accuracy': '0.56', 'eval_precision_macro': '0.3972', 'eval_recall_macro': '0.4217', 'eval_f1_macro': '0.4063', 'eval_precision_weighted': '0.548', 'eval_recall_weighted': '0.56', 'eval_f1_weighted': '0.5505', 'eval_runtime': '2.985', 'eval_samples_per_second': '33.5', 'eval_steps_per_second': '2.345', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.03965', 'grad_norm': '15.25', 'learning_rate': '1.008e-05', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.32', 'eval_accuracy': '0.53', 'eval_precision_macro': '0.4191', 'eval_recall_macro': '0.4241', 'eval_f1_macro': '0.4178', 'eval_precision_weighted': '0.5498', 'eval_recall_weighted': '0.53', 'eval_f1_weighted': '0.5351', 'eval_runtime': '2.987', 'eval_samples_per_second': '33.48', 'eval_steps_per_second': '2.344', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.01792', 'grad_norm': '3.746', 'learning_rate': '6.742e-06', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.786', 'eval_accuracy': '0.55', 'eval_precision_macro': '0.3772', 'eval_recall_macro': '0.4045', 'eval_f1_macro': '0.3902', 'eval_precision_weighted': '0.5174', 'eval_recall_weighted': '0.55', 'eval_f1_weighted': '0.533', 'eval_runtime': '2.986', 'eval_samples_per_second': '33.49', 'eval_steps_per_second': '2.344', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.009809', 'grad_norm': '0.143', 'learning_rate': '3.409e-06', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.902', 'eval_accuracy': '0.52', 'eval_precision_macro': '0.3583', 'eval_recall_macro': '0.3863', 'eval_f1_macro': '0.3704', 'eval_precision_weighted': '0.4963', 'eval_recall_weighted': '0.52', 'eval_f1_weighted': '0.5061', 'eval_runtime': '3.037', 'eval_samples_per_second': '32.93', 'eval_steps_per_second': '2.305', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.004471', 'grad_norm': '0.609', 'learning_rate': '7.576e-08', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.978', 'eval_accuracy': '0.55', 'eval_precision_macro': '0.3757', 'eval_recall_macro': '0.4007', 'eval_f1_macro': '0.3878', 'eval_precision_weighted': '0.5149', 'eval_recall_weighted': '0.55', 'eval_f1_weighted': '0.5319', 'eval_runtime': '2.983', 'eval_samples_per_second': '33.52', 'eval_steps_per_second': '2.346', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'train_runtime': '912.6', 'train_samples_per_second': '7.67', 'train_steps_per_second': '0.482', 'train_loss': '0.4006', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.32', 'eval_accuracy': '0.53', 'eval_precision_macro': '0.4191', 'eval_recall_macro': '0.4241', 'eval_f1_macro': '0.4178', 'eval_precision_weighted': '0.5498', 'eval_recall_weighted': '0.53', 'eval_f1_weighted': '0.5351', 'eval_runtime': '3.006', 'eval_samples_per_second': '33.26', 'eval_steps_per_second': '2.328', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>    best epoch 7 | val F1 0.418 | test acc 0.495 | test macro-F1 0.431 | 15.2 min
 </pre>
 </div>
@@ -9592,160 +8849,6 @@ over an hour on my laptop).</p>
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>==&gt; PubMedBERT  seed=2024
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.138', 'grad_norm': '15.73', 'learning_rate': '2.932e-05', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.131', 'eval_accuracy': '0.54', 'eval_precision_macro': '0.1818', 'eval_recall_macro': '0.3273', 'eval_f1_macro': '0.2338', 'eval_precision_weighted': '0.3', 'eval_recall_weighted': '0.54', 'eval_f1_weighted': '0.3857', 'eval_runtime': '2.993', 'eval_samples_per_second': '33.41', 'eval_steps_per_second': '2.339', 'epoch': '1'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '1.038', 'grad_norm': '12.06', 'learning_rate': '2.674e-05', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.084', 'eval_accuracy': '0.5', 'eval_precision_macro': '0.3361', 'eval_recall_macro': '0.3779', 'eval_f1_macro': '0.3511', 'eval_precision_weighted': '0.4688', 'eval_recall_weighted': '0.5', 'eval_f1_weighted': '0.4781', 'eval_runtime': '2.985', 'eval_samples_per_second': '33.51', 'eval_steps_per_second': '2.345', 'epoch': '2'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.8248', 'grad_norm': '16.61', 'learning_rate': '2.341e-05', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.157', 'eval_accuracy': '0.54', 'eval_precision_macro': '0.3443', 'eval_recall_macro': '0.3535', 'eval_f1_macro': '0.3223', 'eval_precision_weighted': '0.4701', 'eval_recall_weighted': '0.54', 'eval_f1_weighted': '0.4718', 'eval_runtime': '2.985', 'eval_samples_per_second': '33.5', 'eval_steps_per_second': '2.345', 'epoch': '3'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.5092', 'grad_norm': '14.6', 'learning_rate': '2.008e-05', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.406', 'eval_accuracy': '0.55', 'eval_precision_macro': '0.3874', 'eval_recall_macro': '0.4381', 'eval_f1_macro': '0.388', 'eval_precision_weighted': '0.5443', 'eval_recall_weighted': '0.55', 'eval_f1_weighted': '0.5177', 'eval_runtime': '2.984', 'eval_samples_per_second': '33.51', 'eval_steps_per_second': '2.346', 'epoch': '4'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.2494', 'grad_norm': '50.96', 'learning_rate': '1.674e-05', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.414', 'eval_accuracy': '0.58', 'eval_precision_macro': '0.4541', 'eval_recall_macro': '0.4544', 'eval_f1_macro': '0.4499', 'eval_precision_weighted': '0.5598', 'eval_recall_weighted': '0.58', 'eval_f1_weighted': '0.568', 'eval_runtime': '3.044', 'eval_samples_per_second': '32.85', 'eval_steps_per_second': '2.299', 'epoch': '5'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.12', 'grad_norm': '7.766', 'learning_rate': '1.341e-05', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '1.686', 'eval_accuracy': '0.62', 'eval_precision_macro': '0.4948', 'eval_recall_macro': '0.4636', 'eval_f1_macro': '0.4679', 'eval_precision_weighted': '0.6003', 'eval_recall_weighted': '0.62', 'eval_f1_weighted': '0.5992', 'eval_runtime': '3.042', 'eval_samples_per_second': '32.87', 'eval_steps_per_second': '2.301', 'epoch': '6'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.06026', 'grad_norm': '0.812', 'learning_rate': '1.008e-05', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.062', 'eval_accuracy': '0.64', 'eval_precision_macro': '0.5229', 'eval_recall_macro': '0.4795', 'eval_f1_macro': '0.4831', 'eval_precision_weighted': '0.6129', 'eval_recall_weighted': '0.64', 'eval_f1_weighted': '0.6145', 'eval_runtime': '3.041', 'eval_samples_per_second': '32.88', 'eval_steps_per_second': '2.302', 'epoch': '7'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.02071', 'grad_norm': '1.148', 'learning_rate': '6.742e-06', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.398', 'eval_accuracy': '0.65', 'eval_precision_macro': '0.5332', 'eval_recall_macro': '0.4856', 'eval_f1_macro': '0.4898', 'eval_precision_weighted': '0.6243', 'eval_recall_weighted': '0.65', 'eval_f1_weighted': '0.6235', 'eval_runtime': '3.039', 'eval_samples_per_second': '32.9', 'eval_steps_per_second': '2.303', 'epoch': '8'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.01062', 'grad_norm': '0.6602', 'learning_rate': '3.409e-06', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.375', 'eval_accuracy': '0.64', 'eval_precision_macro': '0.5371', 'eval_recall_macro': '0.487', 'eval_f1_macro': '0.4875', 'eval_precision_weighted': '0.6123', 'eval_recall_weighted': '0.64', 'eval_f1_weighted': '0.6162', 'eval_runtime': '3.04', 'eval_samples_per_second': '32.9', 'eval_steps_per_second': '2.303', 'epoch': '9'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'loss': '0.005263', 'grad_norm': '0.1442', 'learning_rate': '7.576e-08', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.518', 'eval_accuracy': '0.67', 'eval_precision_macro': '0.6144', 'eval_recall_macro': '0.5052', 'eval_f1_macro': '0.5089', 'eval_precision_weighted': '0.6537', 'eval_recall_weighted': '0.67', 'eval_f1_weighted': '0.6408', 'eval_runtime': '3.049', 'eval_samples_per_second': '32.8', 'eval_steps_per_second': '2.296', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'train_runtime': '918.3', 'train_samples_per_second': '7.623', 'train_steps_per_second': '0.479', 'train_loss': '0.3977', 'epoch': '10'}
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{'eval_loss': '2.518', 'eval_accuracy': '0.67', 'eval_precision_macro': '0.6144', 'eval_recall_macro': '0.5052', 'eval_f1_macro': '0.5089', 'eval_precision_weighted': '0.6537', 'eval_recall_weighted': '0.67', 'eval_f1_weighted': '0.6408', 'eval_runtime': '3.056', 'eval_samples_per_second': '32.72', 'eval_steps_per_second': '2.29', 'epoch': '10'}
 </pre>
 </div>
 </div>
@@ -10181,11 +9284,11 @@ f1_macro  PubMedBERT - BERT per seed: [-0.015, 0.142, 0.085]  mean = +0.071
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>BERT reached its best validation score at epoch 7-8 in all three runs. PubMedBERT peaked at epoch 10
-in two of three runs, so it might still have improved with more epochs. I kept 10 epochs for both models
+in two of three runs, so it might still have improved with more epochs. We kept 10 epochs for both models
 so they get the same training budget.</p>
 <p>One thing to note: on the validation set the two models are about equal (mean best validation F1 is 0.485
 for BERT and 0.469 for PubMedBERT), while on the test set PubMedBERT is clearly ahead. With only 100
-validation examples, a few questions can change the ranking, so I trust the 200-example test set more
+validation examples, a few questions can change the ranking, so we trust the 200-example test set more
 for the comparison. Validation was only used to pick the checkpoint inside each run.</p>
 </div>
 </div>
@@ -10198,7 +9301,7 @@ for the comparison. Validation was only used to pick the checkpoint inside each 
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="5.3-Per-class-results">5.3 Per-class results<a class="anchor-link" href="#5.3-Per-class-results">¶</a></h3><p>Single runs are noisy (see the table above), so for the per-class results and for the error analysis in
-section 7 I average the test-set probabilities of the 3 seeds of each model and take the argmax. This is a
+section 7 we average the test-set probabilities of the 3 seeds of each model and take the argmax. This is a
 small ensemble, and it shows the typical behaviour of each model better than any one seed does.</p>
 </div>
 </div>
@@ -10322,11 +9425,11 @@ of each model, which is normal for an ensemble.</li>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="6.-Predictions-on-custom-examples">6. Predictions on custom examples<a class="anchor-link" href="#6.-Predictions-on-custom-examples">¶</a></h2><p>I wrote 6 short question + abstract pairs myself (they are made up, not taken from PubMed) to see how
+<h2 id="6.-Predictions-on-custom-examples">6. Predictions on custom examples<a class="anchor-link" href="#6.-Predictions-on-custom-examples">¶</a></h2><p>We wrote 6 short question + abstract pairs ourselves (they are made up, not taken from PubMed) to see how
 the fine-tuned models behave on new input. They cover a clear yes, a clear no, an uncertain finding
 that should be "maybe", a negated result, a mixed result, and one non-medical example to see what
 happens outside the training domain.</p>
-<p>I use the <code>text-classification</code> pipeline with the saved best model of each type. The pipeline accepts a
+<p>We use the <code>text-classification</code> pipeline with the saved best model of each type. The pipeline accepts a
 <code>{"text": ..., "text_pair": ...}</code> dict, so the input is encoded the same way as in training.</p>
 </div>
 </div>
@@ -10688,7 +9791,7 @@ happens outside the training domain.</p>
 <p><strong>Observations</strong></p>
 <p>PubMedBERT got 5 of 6 right, BERT got 2 of 6.</p>
 <ul>
-<li>Neither model said "maybe" for the coffee example, which I wrote to be uncertain (weak association,
+<li>Neither model said "maybe" for the coffee example, which we wrote to be uncertain (weak association,
 confidence interval crossing 1, possible confounding). PubMedBERT said "yes" with 0.99 probability.
 This matches the per-class results: "maybe" is hard to learn from 77 training examples, and the model
 seems to react to phrases like "associated with a lower risk".</li>
@@ -11108,7 +10211,7 @@ both wrong        : 40
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="7.4-Does-domain-vocabulary-explain-the-difference?">7.4 Does domain vocabulary explain the difference?<a class="anchor-link" href="#7.4-Does-domain-vocabulary-explain-the-difference?">¶</a></h3><p>For each test example I compute how fragmented it is under BERT's tokenizer (BERT tokens per word).
+<h3 id="7.4-Does-domain-vocabulary-explain-the-difference?">7.4 Does domain vocabulary explain the difference?<a class="anchor-link" href="#7.4-Does-domain-vocabulary-explain-the-difference?">¶</a></h3><p>For each test example we compute how fragmented it is under BERT's tokenizer (BERT tokens per word).
 If the domain vocabulary is what helps PubMedBERT, the gap between the two models should be larger
 on the more fragmented (more technical) examples.</p>
 </div>
@@ -11404,7 +10507,7 @@ right ones (PubMedBERT 0.75 vs 0.81, BERT 0.70 vs 0.73), and PubMedBERT gives pr
 <li>PubMedBERT's advantage is a bit larger on the most fragmented third of the test set
 (gap 0.149 vs about 0.105 for the other two thirds). That fits the idea that the domain vocabulary
 helps with technical text, but with about 67 examples per group the difference is small and could
-easily be noise. I would not call it proven.</li>
+easily be noise. We would not call it proven.</li>
 <li>A lot of the questions both models get wrong need some reasoning over numbers. For example, in "Are adult body
 circumferences associated with height?" (gold: yes) the abstract reports small but significant
 increases per cm of height. In the hot-flash device example (gold: no), the key fact is a 24%
@@ -11469,14 +10572,14 @@ three seeds BERT was slightly ahead. This matches what Gu et al. (2020) report f
 labelled data (700 training questions), together with the fact that "maybe" often depends on
 the authors' conclusion, which is not part of the input.</li>
 </ul>
-<p><strong>Limitations / what I would try next</strong></p>
+<p><strong>Limitations / what we would try next</strong></p>
 <ul>
 <li>Only 3 seeds and one data split. With 200 test examples, one question is worth 0.5% accuracy, so 5-10 seeds or
 cross-validation would give more reliable numbers.</li>
 <li>The 100-example validation set is noisy. The BERT run it selected (seed 42) turned out to be the weakest on the test set.</li>
 <li>Hyperparameters were not tuned separately per model; both used the same standard values.</li>
 <li>An extra fine-tuning step on the large automatically labelled <code>pqa_artificial</code> set (211k questions) before
-<code>pqa_labeled</code> would probably help with the small-data problem, but it needs more compute than I had on a laptop.</li>
+<code>pqa_labeled</code> would probably help with the small-data problem, but it needs more compute than we had on a laptop.</li>
 </ul>
 <p><strong>Reference:</strong> Gu, Y. et al. (2020). <em>Domain-Specific Language Model Pretraining for Biomedical Natural Language
 Processing.</em> arXiv:2007.15779. Jin, Q. et al. (2019). <em>PubMedQA: A Dataset for Biomedical Research Question
